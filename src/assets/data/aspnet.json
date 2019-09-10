@@ -4,6 +4,13 @@
         "name": "Asp.Net Quiz",
         "description": "Asp.Net Quiz (contains webform, mvc, web API, etc.)"
     },
+    "config":{
+        "shuffleQuestions": true,
+        "showPager": false,
+        "allowBack": true,
+        "autoMove": false,
+        "pageSize": 1
+    },
     "questions": [{
         "Id": 1010,
         "Name": "ASP.NET webform separates the HTML output from program logic using a feature named as", 

@@ -15,11 +15,11 @@ export class AppService {
 
     }
 
-    private questionBaseUrl = 'assets/data/csharp.json';
+    //private questionBaseUrl = 'assets/data/csharp.json';
 
 
-    public getQuestionsByQuizName(): Observable<any> {
-        return this.http.get(this.questionBaseUrl);
+    public getQuestionsByQuizName(questionUrl:string): Observable<any> {
+        return this.http.get(questionUrl);
     } 
    
 

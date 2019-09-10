@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
+import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { AppService } from '../services/app.service';
@@ -17,7 +18,8 @@ import { HttpClientModule } from '@angular/common/http';
   imports: [
     BrowserModule,
     AppRoutingModule,  
-    HttpClientModule  
+    HttpClientModule  ,
+     FormsModule //ngmodel comes from here
   ],
   providers: [AppService],
   bootstrap: [AppComponent]
