@@ -78,7 +78,50 @@ export class HomeComponent {
 
     }
 
+
+    isCorrect(question) {
+        var result = 'wrong';
+        var overallresult = '';
+        question.Options.forEach(function (option, index, array) {      
+        var item = option;
+       
+        if (item.IsAnswer) {
+            if (item.Selected == 'undefined' || item.Selected == null || item.Selected == '' || item.Selected == 'false' || item.Selected == 'False'){
+                result = 'wrong';
+                overallresult = 'wrong';                
+            }            
+            else if (item.Selected == true || item.Selected == 'true' || item.Selected == 'True'){
+
+                if (overallresult == 'wrong') {
+                    // alert('reseting ..' + overallresult);
+                     result = overallresult;
+                 } else {
+                     result = 'correct';
+                 }  
+            }            
+            else {
+                console.log(item.Selected);
+                result = 'wrong';
+                overallresult = 'wrong';
+            }        
+        } 
+    });
+        return result;
+    }
     
+
+   isAnswered (index) {
+        var answered = 'Not Answered';
+        this.filteredQuestions[index].Options.forEach(function (element, index, array) {
+            console.log(element.Selected);
+            if (element.Selected == true) { //element.Selected  would be undefined if property does not exist|has not been clicked on
+               
+                answered = 'Answered';
+                return false;
+            }
+        });
+        return answered;
+    };
 
     
     onSelect(question) {
@@ -119,6 +162,7 @@ export class HomeComponent {
     goTo(position){
         console.log('position'+position)  ;
         if (position ==0 || position > this.totalItems) return;
+        this.mode = 'quiz';
         if (position<=this.totalItems){
             this.currentPage= position;
         }

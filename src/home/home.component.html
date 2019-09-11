@@ -58,20 +58,20 @@
             <!-- <pagination ng-show="config.showPager" direction-links="false" total-items="totalItems" items-per-page="itemsPerPage" ng-model="currentPage" ng-change="pageChanged()"></pagination> -->
         </div>
     </div>   
-    <!-- <div class="row review" ng-show="mode=='review'">
-        <div class="col-sm-4" ng-repeat="question in questions">
-            <div ng-click="goTo($index + 1)" class="{{ isAnswered($index) == 'Answered'? 'answered': 'not-answered' }}">{{$index + 1}}. {{ isAnswered($index) }}</div>
+    <div class="row review" *ngIf="mode=='review'">
+        <div class="col-sm-4" *ngFor="let question of filteredQuestions ;index as i">
+            <div (click)="goTo(i + 1)" class="{{ isAnswered(i) == 'Answered'? 'answered': 'not-answered' }}">{{i+ 1}}. {{ isAnswered(i) }}</div>
         </div>
-    </div> -->
+    </div>
     <div class="result" *ngIf="mode=='result'">
         <h2>Quiz Result</h2>
-        <div ngFor="let question of questions">
+        <div *ngFor="let question of filteredQuestions;index as i">
             <div class="result-question">
-                <h4>{{$index + 1}}. {{question.Name}}</h4>
+                <h4>{{i+1}}. {{question.Name}}</h4>
                 <div class="row">
-                    <div class="col-md-6" ngFor="option in question.Options">
+                    <div class="col-md-6" *ngFor="let option of question.Options">
                         <div>
-                            <input id="{{Option.Id}}" type="checkbox" disabled="disabled" [(ngModel)]="option.Selected" />
+                            <input id="{{option.Id}}" type="checkbox" disabled="disabled" [(ngModel)]="option.Selected" />
                             {{option.Name}}
                         </div>
                     </div>
@@ -79,7 +79,7 @@
                 <h4 class="alert {{ isCorrect(question) == 'correct'? 'alert-success': 'alert-danger'}}">Your answer is {{isCorrect(question)}}.</h4>
             </div>
         </div>
-        <h4 class="alert alert-info text-center">You may close this window now.</h4>
+        <h4 class="alert alert-info text-center" (click)="mode = 'quiz'">You may close this window now.</h4>
     </div>
     <hr />
     <div class="" *ngIf="mode!='result'">
