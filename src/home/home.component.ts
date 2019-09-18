@@ -24,39 +24,25 @@ export class HomeComponent {
     quizName:string;
     allowBack:boolean;
     mode:string;
+    quizes:any[]
 
-
-    constructor(private appService: AppService, private router: Router,
+    constructor(private quizService: AppService, private router: Router,
         private route: ActivatedRoute) { }
 
     ngOnInit() {
-        this.quizName  =  'assets/data/csharp.json';
-        var data = this.appService.getQuestionsByQuizName(this.quizName);
-        this.currentPage = 1 ;
-        this.autoMove = true;
-        this.mode = 'quiz';
-        data.subscribe(           
-            item => {
-                this.itemsPerPage = item.config.pageSize;               
-                var begin = ((this.currentPage - 1) * this.itemsPerPage),
-                end = begin + this.itemsPerPage;
 
-                this.questions = item.questions.slice(begin, end);  
-                this.pageTitle =item.quiz.name ; 
-                this.filteredQuestions = item.questions;
-                this.totalItems = item.questions.length ;  
-                this.allowBack = item.config.allowBack ;        
-                            
-            },
-            error => this.errorMessage = <any>error
-        );  
-      
+       
+        this.quizes =this.quizService.getAll();
+        this.quizName = this.quizes[0].id;              
+       
+        this.loadQuiz( this.quizName);
+        
     }
  
-    loadQuiz(){
-
+    loadQuiz(quizName:string){
+        this.mode = "quiz";
         console.log('quiz name' + this.quizName);
-        var data = this.appService.getQuestionsByQuizName(this.quizName);
+        var data = this.quizService.getQuestionsByQuizName(quizName);
         this.currentPage = 1 ;
         this.autoMove = true;
        
@@ -80,6 +66,7 @@ export class HomeComponent {
 
 
     isCorrect(question) {
+       
         var result = 'wrong';
         var overallresult = '';
         question.Options.forEach(function (option, index, array) {      

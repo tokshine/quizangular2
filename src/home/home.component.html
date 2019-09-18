@@ -1,3 +1,7 @@
+<!-- 
+https://github.com/softgandhi/ng2-quiz/blob/master/src/app/quiz/quiz.component.ts
+https://www.codeproject.com/Articles/1167451/Quiz-Application-in-Angular -->
+
 <div class="header">
     <div class="row">
         <div class="col-md-8">
@@ -6,10 +10,9 @@
         <div class="col-md-4 header-right">
             <!-- In actual application, you may wish to load the quiz List using angular service. -->
             Select Quiz:
-            <select id="quizList" [(ngModel)]="quizName" (change)="loadQuiz()" >
-                <option value="assets/data/aspnet.json">Asp.Net</option>
-                <option value="assets/data/csharp.json">C Sharp</option>
-                <option value="assets/data/designPatterns.json">Design Patterns</option>
+            <select id="quizList" [(ngModel)]="quizName" (change)="loadQuiz(quizName)" >             
+
+                <option *ngFor="let q of quizes" [value]="q.id">{{q.name}}</option>
             </select>
 <!-- todo difference btw (change) and (ngModelChange) -->
             <!-- <select id="quizList" [(ngModel)]="quizName" (ngModelChange)="loadQuiz($event)" name="quizName">
@@ -26,7 +29,7 @@
         <div class="col-md-12"><h1 class="center">{{pageTitle}}</h1><hr /></div>
     </div>
 
-    <div *ngIf="mode=='quiz'">
+    <div *ngIf="mode=='quiz' && filteredQuestions">
         <div *ngFor="let question of questions">
             <div class="label label-warning">Question {{currentPage}} of {{totalItems}}.</div>
             <div class="row">

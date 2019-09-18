@@ -15,6 +15,14 @@ export class AppService {
 
     }
 
+    public getAll() {
+            return [
+            {id:'assets/data/aspnet.json' ,name:'Asp.Net'},
+            { id :'assets/data/csharp.json',name :'CSharp'},
+            { id :'assets/data/designPatterns.json',name :'Design Patterns'}
+        ]
+    }
+
     //private questionBaseUrl = 'assets/data/csharp.json';
 
 
