@@ -29,20 +29,20 @@ https://www.codeproject.com/Articles/1167451/Quiz-Application-in-Angular -->
         <div class="col-md-12"><h1 class="center">{{pageTitle}}</h1><hr /></div>
     </div>
 
-    <div *ngIf="mode=='quiz' && filteredQuestions">
-        <div *ngFor="let question of questions">
+    <div *ngIf="mode=='quiz' && quiz">
+        <div *ngFor="let question of filteredQuestions">
             <div class="label label-warning">Question {{currentPage}} of {{totalItems}}.</div>
             <div class="row">
                 <div class="col-md-12">
-                    <h2><span >{{question.Name}}</span></h2>
+                    <h2><span >{{question.name}}</span></h2>
                 </div>
             </div>
             <div class="row text-left options">
-                <div class="col-md-6" *ngFor="let option of  question.Options">
+                <div class="col-md-6" *ngFor="let option of  question.options">
                     <div class="option">
-                        <label class="" for="{{option.Id}}">
-                            <input id="{{option.Id}}" type="checkbox" [(ngModel)]="option.Selected" (change)="onSelect(question);" />
-                            {{option.Name}}
+                        <label class="" for="{{option.id}}">
+                            <input id="{{option.id}}" type="checkbox" [(ngModel)]="option.selected" (change)="onSelect(question);" />
+                            {{option.name}}
                         </label>
                     </div>
                 </div>
@@ -51,31 +51,31 @@ https://www.codeproject.com/Articles/1167451/Quiz-Application-in-Angular -->
         <hr />
         <div class="quizNav">
             <div>
-                <button class="btn btn-default" *ngIf="allowBack" (click)="goTo(1);">First</button>
+                <button class="btn btn-default" *ngIf="config.allowBack" (click)="goTo(1);">First</button>
                 <!-- <button class="btn btn-default" *ngIf="!allowBack" (click)="goTo(1);">First</button> -->
-                <button class="btn btn-default"  *ngIf="allowBack" (click)="goTo(currentPage - 1);">Prev</button>
+                <button class="btn btn-default"  *ngIf="config.allowBack" (click)="goTo(currentPage - 1);">Prev</button>
                 <button class="btn btn-primary" (click)="goTo(currentPage + 1);">Next</button>
-                <button class="btn btn-default" *ngIf="allowBack" (click)="goTo(totalItems);">Last</button>
+                <button class="btn btn-default" *ngIf="config.allowBack" (click)="goTo(totalItems);">Last</button>
             </div>
             <br />
             <!-- <pagination ng-show="config.showPager" direction-links="false" total-items="totalItems" items-per-page="itemsPerPage" ng-model="currentPage" ng-change="pageChanged()"></pagination> -->
         </div>
     </div>   
     <div class="row review" *ngIf="mode=='review'">
-        <div class="col-sm-4" *ngFor="let question of filteredQuestions ;index as i">
+        <div class="col-sm-4" *ngFor="let question of quiz.questions ;index as i">
             <div (click)="goTo(i + 1)" class="{{ isAnswered(i) == 'Answered'? 'answered': 'not-answered' }}">{{i+ 1}}. {{ isAnswered(i) }}</div>
         </div>
     </div>
     <div class="result" *ngIf="mode=='result'">
         <h2>Quiz Result</h2>
-        <div *ngFor="let question of filteredQuestions;index as i">
+        <div *ngFor="let question of quiz.questions;index as i">
             <div class="result-question">
-                <h4>{{i+1}}. {{question.Name}}</h4>
+                <h4>{{i+1}}. {{question.name}}</h4>
                 <div class="row">
-                    <div class="col-md-6" *ngFor="let option of question.Options">
+                    <div class="col-md-6" *ngFor="let option of question.options">
                         <div>
-                            <input id="{{option.Id}}" type="checkbox" disabled="disabled" [(ngModel)]="option.Selected" />
-                            {{option.Name}}
+                            <input id="{{option.Id}}" type="checkbox" disabled="disabled" [(ngModel)]="option.selected" />
+                            {{option.name}}
                         </div>
                     </div>
                 </div>

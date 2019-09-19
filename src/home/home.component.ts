@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AppService } from '../services/app.service';
+import { Quiz, QuizConfig } from '../models';
+//import { Option, Question, Quiz, QuizConfig } from '../models/index';
 
 //I do not know how to import javascript/jquery into angular project yet
 // import {helper} from '../assets/scripts/helperService.js'
@@ -16,13 +18,28 @@ export class HomeComponent {
     pageTitle = 'C# and .Net Framework';
     currentPage :number;
     totalItems:number;
-    filteredQuestions: any[];
+   // filteredQuestions: any[];
     itemsPerPage:number;
     questions: any[];
+    config: QuizConfig = {  //same config = new QuizConfig(data)  in this case we are initializing with default settings
+        'allowBack': true,
+        'allowReview': true,
+        'autoMove': false,  // if true, it will move to next question automatically when answered.
+        'duration': 300,  // indicates the time (in secs) in which quiz needs to be completed. 0 means unlimited.
+        'pageSize': 1,
+        'requiredAll': false,  // indicates if you must answer all the questions before submitting.
+        'richText': false,
+        'shuffleQuestions': false,
+        'shuffleOptions': false,
+        'showClock': false,
+        'showPager': true,
+        'theme': 'none'
+      };
     errorMessage: string;
     autoMove:boolean;
     quizName:string;
     allowBack:boolean;
+    quiz:Quiz ;
     mode:string;
     quizes:any[]
 
@@ -30,7 +47,6 @@ export class HomeComponent {
         private route: ActivatedRoute) { }
 
     ngOnInit() {
-
        
         this.quizes =this.quizService.getAll();
         this.quizName = this.quizes[0].id;              
@@ -42,34 +58,44 @@ export class HomeComponent {
     loadQuiz(quizName:string){
         this.mode = "quiz";
         console.log('quiz name' + this.quizName);
-        var data = this.quizService.getQuestionsByQuizName(quizName);
+        //good practice
         this.currentPage = 1 ;
         this.autoMove = true;
-       
-        data.subscribe(           
-            item => {
+         this.quizService.getQuestionsByQuizName(quizName).subscribe(           
+            item => {  this.quiz = new Quiz(item);  
                 this.itemsPerPage = item.config.pageSize;               
-                var begin = ((this.currentPage - 1) * this.itemsPerPage),
-                end = begin + this.itemsPerPage;
+                // var begin = ((this.currentPage - 1) * this.itemsPerPage),
+                // end = begin + this.itemsPerPage;
 
-                this.questions = item.questions.slice(begin, end);  
+                // this.questions = item.questions.slice(begin, end);  
                 this.pageTitle =item.quiz.name ; 
-                this.filteredQuestions = item.questions;
-                this.totalItems = item.questions.length            
-                            
+               // this.filteredQuestions = item.questions;
+                this.totalItems = item.questions.length ;
+                this.config = item.config;  //overriding the default settings        
             },
             error => this.errorMessage = <any>error
-        );   
+        );
 
+        // this is not a good practice
+      //  var data = this.quizService.getQuestionsByQuizName(quizName);    
+       // data.subscribe(           
+        //             item => {  this.quiz = new Quiz(item);  }
+        // );
 
     }
 
+
+    get filteredQuestions(){
+        var begin = ((this.currentPage - 1) * this.itemsPerPage),
+                end = begin + this.itemsPerPage;
+           return     this.quiz.questions.slice(begin, end);  
+    }
 
     isCorrect(question) {
        
         var result = 'wrong';
         var overallresult = '';
-        question.Options.forEach(function (option, index, array) {      
+        question.options.forEach(function (option, index, array) {      
         var item = option;
        
         if (item.IsAnswer) {
@@ -99,9 +125,9 @@ export class HomeComponent {
 
    isAnswered (index) {
         var answered = 'Not Answered';
-        this.filteredQuestions[index].Options.forEach(function (element, index, array) {
-            console.log(element.Selected);
-            if (element.Selected == true) { //element.Selected  would be undefined if property does not exist|has not been clicked on
+        this.quiz.questions[index].options.forEach(function (element, index, array) {
+            console.log(element.selected);
+            if (element.selected == true) { //element.Selected  would be undefined if property does not exist|has not been clicked on
                
                 answered = 'Answered';
                 return false;
