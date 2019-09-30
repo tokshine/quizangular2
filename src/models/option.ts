@@ -10,7 +10,7 @@ export class Option {
         this.id =data.Id;
         this.name = data.Name;
         this.isAnswer = data.IsAnswer;
-        this.selected = data.selected;
+        this.selected = false; //this value does not exist from json data ,so initialise as false
 
     }
 

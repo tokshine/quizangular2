@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AppService } from '../services/app.service';
-import { Quiz, QuizConfig } from '../models';
+import { Quiz, QuizConfig, Question ,Option} from '../models';
 //import { Option, Question, Quiz, QuizConfig } from '../models/index';
 
 //I do not know how to import javascript/jquery into angular project yet
@@ -15,11 +15,8 @@ import { Quiz, QuizConfig } from '../models';
     templateUrl: './home.component.html'
 })
 export class HomeComponent {
-    pageTitle = 'C# and .Net Framework';
-    currentPage :number;
-    totalItems:number;
-   // filteredQuestions: any[];
-    itemsPerPage:number;
+    pageTitle = 'C# and .Net Framework';    
+   // filteredQuestions: any[]; see below now defined as a property    
     questions: any[];
     config: QuizConfig = {  //same config = new QuizConfig(data)  in this case we are initializing with default settings
         'allowBack': true,
@@ -41,7 +38,13 @@ export class HomeComponent {
     allowBack:boolean;
     quiz:Quiz ;
     mode:string;
-    quizes:any[]
+    quizes:any[];
+    //type is inferred
+    pager= {
+        index:0,    
+        itemsPerPage:1,  
+        totalItems:1
+    }
 
     constructor(private quizService: AppService, private router: Router,
         private route: ActivatedRoute) { }
@@ -58,19 +61,15 @@ export class HomeComponent {
     loadQuiz(quizName:string){
         this.mode = "quiz";
         console.log('quiz name' + this.quizName);
-        //good practice
-        this.currentPage = 1 ;
-        this.autoMove = true;
+        
+        //good practice        
+       
          this.quizService.getQuestionsByQuizName(quizName).subscribe(           
             item => {  this.quiz = new Quiz(item);  
-                this.itemsPerPage = item.config.pageSize;               
-                // var begin = ((this.currentPage - 1) * this.itemsPerPage),
-                // end = begin + this.itemsPerPage;
-
-                // this.questions = item.questions.slice(begin, end);  
-                this.pageTitle =item.quiz.name ; 
-               // this.filteredQuestions = item.questions;
-                this.totalItems = item.questions.length ;
+                this.pager.itemsPerPage = item.config.pageSize;               
+                this.pager.index = 0;
+                this.pageTitle =item.quiz.name ;                         
+                this.pager.totalItems = item.questions.length ;
                 this.config = item.config;  //overriding the default settings        
             },
             error => this.errorMessage = <any>error
@@ -85,76 +84,105 @@ export class HomeComponent {
     }
 
 
-    get filteredQuestions(){
-        var begin = ((this.currentPage - 1) * this.itemsPerPage),
-                end = begin + this.itemsPerPage;
-           return     this.quiz.questions.slice(begin, end);  
-    }
-
-    isCorrect(question) {
-       
-        var result = 'wrong';
-        var overallresult = '';
-        question.options.forEach(function (option, index, array) {      
-        var item = option;
-       
-        if (item.IsAnswer) {
-            if (item.Selected == 'undefined' || item.Selected == null || item.Selected == '' || item.Selected == 'false' || item.Selected == 'False'){
-                result = 'wrong';
-                overallresult = 'wrong';                
-            }            
-            else if (item.Selected == true || item.Selected == 'true' || item.Selected == 'True'){
-
-                if (overallresult == 'wrong') {
-                    // alert('reseting ..' + overallresult);
-                     result = overallresult;
-                 } else {
-                     result = 'correct';
-                 }  
-            }            
-            else {
-                console.log(item.Selected);
-                result = 'wrong';
-                overallresult = 'wrong';
-            }        
-        } 
-    });
-        return result;
-    }
-    
-
-   isAnswered (index) {
-        var answered = 'Not Answered';
-        this.quiz.questions[index].options.forEach(function (element, index, array) {
-            console.log(element.selected);
-            if (element.selected == true) { //element.Selected  would be undefined if property does not exist|has not been clicked on
+    //this is like watch in angularjs
+    get filteredQuestions(){        
+        var begin = ((this.pager.index) * this.pager.itemsPerPage),
+                end = begin + this.pager.itemsPerPage;
                
-                answered = 'Answered';
-                return false;
-            }
-        });
-        return answered;
+           return     (this.quiz.questions)?  this.quiz.questions.slice(begin, end) :[];  
+    }
+
+
+    //old schoool
+    // isCorrect(question) {
+       
+    //     var result = 'wrong';
+    //     var overallresult = '';
+    //     question.options.forEach(function (option, index, array) {      
+    //     var item = option;
+       
+    //     if (item.isAnswer) {
+           
+    //         if (item.selected == 'undefined' || item.selected == null || item.selected == '' || item.selected == 'false' || item.selected == 'False'){
+    //             result = 'wrong';
+    //             overallresult = 'wrong';                
+    //         }            
+    //         else if (item.selected == true || item.selected == 'true' || item.selected == 'True'){
+
+    //             if (overallresult == 'wrong') {
+    //                 // alert('reseting ..' + overallresult);
+    //                  result = overallresult;
+    //              } else {
+    //                  result = 'correct';
+    //              }  
+    //         }            
+    //         else {
+    //             console.log(item.selected);
+    //             result = 'wrong';
+    //             overallresult = 'wrong';
+    //         }        
+    //     } 
+    // });
+  
+    //     return result;
+    // }   
+
+
+
+    isCorrect(question:Question){
+        //this logic here is really powerful
+        //note 'every' is more interested in the all items that meets condition
+        //if one fails the condition then wrong is returned        
+     
+       return question.options.every(x => x.selected === x.isAnswer) ? 'correct' : 'wrong';       
+    }
+
+
+
+    isAnswered (question:Question) {
+        //old school approach
+        // var answered = 'Not Answered';
+        //     question.options.forEach(function (element, index, array) {
+        //             console.log(element.selected);
+        //             if (element.selected == true) { //element.Selected  would be undefined if property does not exist|has not been clicked on
+                       
+        //                answered = 'Answered';
+        //                return false;
+        //             }
+        //         });
+        // return answered;
+        //smarter way to do the above note find is more interested in the first item that means condition
+        return question.options.find(x=>x.selected)? 'Answered' : 'Not Answered';
+
     };
 
     
-    onSelect(question) {
+    onSelect(question:Question,option:Option) {
         console.log(question);
 
-        if (question.QuestionTypeId == 1) {        
-            question.Options.forEach(function (option, index, array) {
-                var val = option;
-                //will love to use this approach but dont know how to 
-                //use javascipt
-                // if (helper.toBool(item.Selected)) {
-                // }
-                if (val.Selected == 'undefined' || val.Selected == null || val.Selected == '' || val.Selected == 'false' || val.Selected == 'False')
-                console.log('unidentified');
-                else if (val.Selected == true || val.Selected == 'true' || val.Selected == 'True')
-                console.log('identified')
-                 else
-                 console.log('unidentified');
+        if (question.questionTypeId == 2) {  // questionTypeId as 2 implies supports multiple choices  
+            //old school approach    
+            // question.options.forEach(function (optionItem, index, array) {
+            //     var val = optionItem;
+            //     //will love to use this approach but dont know how to 
+            //     //use javascipt
+            //     // if (helper.toBool(item.Selected)) {
+            //     // }
+            //      if (val.selected == true )
+            //         console.log('identified')
+            //      else
+            //         console.log('unidentified');
              
-            });
+            // });
+
+            //smart approach
+            question.options.forEach((x) => { if (x.id !== option.id) x.selected = false;  console.log(x.selected) });
+            
+        }
+
+        if (this.config.autoMove)
+        {
+            this.goTo(this.pager.index + 1);
         }
        
         //I dont want automove for now 
@@ -172,20 +200,22 @@ export class HomeComponent {
         this.mode = 'result';
     }
 
-    goTo(position){
-        console.log('position'+position)  ;
-        if (position ==0 || position > this.totalItems) return;
+    goTo(position:number){
+      
+        if (position < 0 || position > this.pager.totalItems) return;
         this.mode = 'quiz';
-        if (position<=this.totalItems){
-            this.currentPage= position;
+        if (position < this.pager.totalItems){            
+            this.pager.index= position;
         }
-        if (this.autoMove == true && this.currentPage <=this.totalItems)  {                
-        var begin = ((position- 1) * this.itemsPerPage),
-        end = begin + this.itemsPerPage ;    
-        console.log('end'+end)  ;
-        console.log('begin'+ begin)  ;
+        if (position==this.pager.totalItems){            
+            this.pager.index= position-1;
         }
-        this.questions = this.filteredQuestions.slice(begin, end);  //slice= no of items to return= end - begin ,counting index  from 'begin'
+        // if (this.autoMove == true && this.currentPage <=this.totalItems)  {                
+        //     var begin = ((position- 1) * this.itemsPerPage),
+        //     end = begin + this.itemsPerPage ;    
+        //     console.log('end'+end)  ;
+        //     console.log('begin'+ begin)  ;
+        // }        
     }
   
 

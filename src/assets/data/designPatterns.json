@@ -8,13 +8,13 @@
         "shuffleQuestions": true,
         "showPager": false,
         "allowBack": true,
-        "autoMove": false,
+        "autoMove": true,
         "pageSize": 1
     },
     "questions": [{
         "Id": 1010,
         "Name": "In SOLID principle, O stands for:", 
-        "QuestionTypeId": 1,
+        "QuestionTypeId": 2,
         "Options": [
             { "Id": 1055, "QuestionId": 1010, "Name": "Objects and Variables", "IsAnswer": false },
             { "Id": 1056, "QuestionId": 1010, "Name": "Open-Closed Principle", "IsAnswer": true },

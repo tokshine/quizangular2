@@ -31,7 +31,7 @@ https://www.codeproject.com/Articles/1167451/Quiz-Application-in-Angular -->
 
     <div *ngIf="mode=='quiz' && quiz">
         <div *ngFor="let question of filteredQuestions">
-            <div class="label label-warning">Question {{currentPage}} of {{totalItems}}.</div>
+            <div class="label label-warning">Question {{pager.index + 1}} of {{pager.totalItems}}.</div>
             <div class="row">
                 <div class="col-md-12">
                     <h2><span >{{question.name}}</span></h2>
@@ -40,8 +40,8 @@ https://www.codeproject.com/Articles/1167451/Quiz-Application-in-Angular -->
             <div class="row text-left options">
                 <div class="col-md-6" *ngFor="let option of  question.options">
                     <div class="option">
-                        <label class="" for="{{option.id}}">
-                            <input id="{{option.id}}" type="checkbox" [(ngModel)]="option.selected" (change)="onSelect(question);" />
+                        <label class="" for="{{option.id}}"> 
+                            <input id="{{option.id}}" type="checkbox" [(ngModel)]="option.selected" (change)="onSelect(question,option);" />
                             {{option.name}}
                         </label>
                     </div>
@@ -51,11 +51,11 @@ https://www.codeproject.com/Articles/1167451/Quiz-Application-in-Angular -->
         <hr />
         <div class="quizNav">
             <div>
-                <button class="btn btn-default" *ngIf="config.allowBack" (click)="goTo(1);">First</button>
+                <button class="btn btn-default" *ngIf="config.allowBack" (click)="goTo(0);">First</button>
                 <!-- <button class="btn btn-default" *ngIf="!allowBack" (click)="goTo(1);">First</button> -->
-                <button class="btn btn-default"  *ngIf="config.allowBack" (click)="goTo(currentPage - 1);">Prev</button>
-                <button class="btn btn-primary" (click)="goTo(currentPage + 1);">Next</button>
-                <button class="btn btn-default" *ngIf="config.allowBack" (click)="goTo(totalItems);">Last</button>
+                <button class="btn btn-default"  *ngIf="config.allowBack" (click)="goTo(pager.index - 1);">Prev</button>
+                <button class="btn btn-primary" (click)="goTo(pager.index + 1);">Next</button>
+                <button class="btn btn-default" *ngIf="config.allowBack" (click)="goTo(pager.totalItems-1);">Last</button>
             </div>
             <br />
             <!-- <pagination ng-show="config.showPager" direction-links="false" total-items="totalItems" items-per-page="itemsPerPage" ng-model="currentPage" ng-change="pageChanged()"></pagination> -->
@@ -63,7 +63,7 @@ https://www.codeproject.com/Articles/1167451/Quiz-Application-in-Angular -->
     </div>   
     <div class="row review" *ngIf="mode=='review'">
         <div class="col-sm-4" *ngFor="let question of quiz.questions ;index as i">
-            <div (click)="goTo(i + 1)" class="{{ isAnswered(i) == 'Answered'? 'answered': 'not-answered' }}">{{i+ 1}}. {{ isAnswered(i) }}</div>
+            <div (click)="goTo(i + 1)" class="{{ isAnswered(question) == 'Answered'? 'answered': 'not-answered' }}">{{i+ 1}}. {{ isAnswered(question) }}</div>
         </div>
     </div>
     <div class="result" *ngIf="mode=='result'">
@@ -74,7 +74,7 @@ https://www.codeproject.com/Articles/1167451/Quiz-Application-in-Angular -->
                 <div class="row">
                     <div class="col-md-6" *ngFor="let option of question.options">
                         <div>
-                            <input id="{{option.Id}}" type="checkbox" disabled="disabled" [(ngModel)]="option.selected" />
+                            <input id="{{option.id}}" type="checkbox" disabled="disabled" [(ngModel)]="option.selected" />
                             {{option.name}}
                         </div>
                     </div>
