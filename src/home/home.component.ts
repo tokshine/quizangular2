@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component ,OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AppService } from '../services/app.service';
 import { Quiz, QuizConfig, Question ,Option} from '../models';
@@ -14,7 +14,7 @@ import { Quiz, QuizConfig, Question ,Option} from '../models';
     selector: 'home',
     templateUrl: './home.component.html'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
     pageTitle = 'C# and .Net Framework';    
    // filteredQuestions: any[]; see below now defined as a property    
     questions: any[];
@@ -39,6 +39,11 @@ export class HomeComponent {
     quiz:Quiz ;
     mode:string;
     quizes:any[];
+    startTime:Date = new Date;
+    elapsedTime:string  = '00:00';
+    timer :any = null;
+    duration :string;
+
     //type is inferred
     pager= {
         index:0,    
@@ -57,7 +62,27 @@ export class HomeComponent {
         this.loadQuiz( this.quizName);
         
     }
+
+    tick(){
+      const now = new Date();
+      //now.getTime() - this.startTime.getTime() note this line return milliseconds 
+      const diff = (now.getTime() - this.startTime.getTime())/1000; //diff and converting to secs
+       if (diff > this.config.duration)
+       {
+         this.onSubmit();
+       }
+     this.elapsedTime = this.parseTime(diff);
+    }
  
+
+    parseTime(totalSeconds: number) {
+        let mins: string | number = Math.floor(totalSeconds / 60); //this string | number not quite clear to me
+        let secs: string | number = Math.round(totalSeconds % 60);
+        mins = (mins < 10 ? '0' : '') + mins;
+        secs = (secs < 10 ? '0' : '') + secs;
+        return `${mins}:${secs}`;
+      }
+
     loadQuiz(quizName:string){
         this.mode = "quiz";
         console.log('quiz name' + this.quizName);
@@ -70,7 +95,9 @@ export class HomeComponent {
                 this.pager.index = 0;
                 this.pageTitle =item.quiz.name ;                         
                 this.pager.totalItems = item.questions.length ;
-                this.config = item.config;  //overriding the default settings        
+               // this.config = item.config;  //overriding the default settings  
+                this.duration = this.parseTime(this.config.duration);
+                this.timer= setInterval(()=>this.tick(),1000);      
             },
             error => this.errorMessage = <any>error
         );
@@ -82,6 +109,9 @@ export class HomeComponent {
         // );
 
     }
+
+
+
 
 
     //this is like watch in angularjs
@@ -174,7 +204,7 @@ export class HomeComponent {
             //         console.log('unidentified');
              
             // });
-
+            
             //smart approach
             question.options.forEach((x) => { if (x.id !== option.id) x.selected = false;  console.log(x.selected) });
             
@@ -200,15 +230,11 @@ export class HomeComponent {
         this.mode = 'result';
     }
 
-    goTo(position:number){
-      
-        if (position < 0 || position > this.pager.totalItems) return;
-        this.mode = 'quiz';
-        if (position < this.pager.totalItems){            
-            this.pager.index= position;
-        }
-        if (position==this.pager.totalItems){            
-            this.pager.index= position-1;
+    goTo(position:number){ 
+
+        if (position >= 0 && position < this.pager.totalItems) {
+            this.pager.index = position;
+            this.mode = 'quiz'; // this.mode = 'quiz';//sort of good practice to set the page mode
         }
         // if (this.autoMove == true && this.currentPage <=this.totalItems)  {                
         //     var begin = ((position- 1) * this.itemsPerPage),

@@ -32,6 +32,7 @@ https://www.codeproject.com/Articles/1167451/Quiz-Application-in-Angular -->
     <div *ngIf="mode=='quiz' && quiz">
         <div *ngFor="let question of filteredQuestions">
             <div class="label label-warning">Question {{pager.index + 1}} of {{pager.totalItems}}.</div>
+            <div *ngIf="config.duration" class="badge badge-info float-right">Time: {{elapsedTime}} / {{duration}}</div>
             <div class="row">
                 <div class="col-md-12">
                     <h2><span >{{question.name}}</span></h2>
